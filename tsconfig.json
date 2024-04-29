@@ -5,14 +5,17 @@
     "sourceMap": true,
     "target": "ES2020",
     "module": "NodeNext",
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "DOM.Iterable"],
+    "downlevelIteration": true,
     "moduleResolution": "NodeNext",
     "outDir": "dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
     "strict": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "alwaysStrict": true,
-    "downlevelIteration": true
+    "alwaysStrict": true
   }
 }
