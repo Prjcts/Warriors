@@ -2,9 +2,9 @@ import { pool } from '../utils/db';
 import { ValidationError } from '../utils/errors';
 import { v4 as uuid } from 'uuid';
 import { FieldPacket } from 'mysql2';
-import { WarriorData } from '../types/types';
-import { WarriorRecordResult } from '../types/types';
+import { stat } from 'fs';
 
+type WarriorRecordResult = [Warrior[], FieldPacket[]];
 
 class Warrior {
   id?: string;
@@ -15,33 +15,41 @@ class Warrior {
   readonly agility: number;
   wins?: number;
 
-  constructor(obj: WarriorData) {
+  constructor(obj: Omit<Warrior, 'insert' | 'update'>) {
     const { id, name, strength, defence, stamina, agility, wins } = obj;
 
-    const sum = [strength, defence, stamina, agility].reduce((prev, current) => prev + current, 0);
+    const stats = [strength, defence, stamina, agility];
 
-    if (sum !==10){
-        throw new Error(`Wrong statistic number, the sum of them must be 10, but it is: ${sum}`);
+    const sum = stats.reduce((prev, current) => prev + current, 0);
+
+    stats.forEach((stat) => {
+      if (stat < 1) {
+        throw new ValidationError('Single hero power can not be less than 1');
+      } else return stats;
+    });
+
+    if (sum !== 10) {
+      throw new Error(
+        `Wrong statistic number, the sum of them must be 10, but it is: ${sum}`,
+      );
     }
 
     if (name.length < 3 || name.length > 50) {
-      throw new ValidationError('The name of the warrior must contain at least 3 and maximum 50 characters');
+      throw new ValidationError(
+        'The name of the warrior must contain at least 3 and maximum 50 characters',
+      );
     }
 
-    this.id = id;
     this.name = name;
     this.strength = strength;
     this.defence = defence;
     this.stamina = stamina;
     this.agility = agility;
-    this.wins = wins;
+    this.id = id ?? uuid();
+    this.wins = wins ?? 0;
   }
 
-  async insert(): Promise<string> {
-    if (!this.id) {
-      this.id = uuid();
-    }
-
+  async insert(): Promise<string | undefined> {
     await pool.execute(
       'INSERT INTO `warrior`(`id`, `name`, `strength`, `defence`, `stamina`, `agility`, `wins`) VALUES(:id, :name, :strength, :defence, :stamina, :agility, :wins)',
       {
@@ -58,6 +66,24 @@ class Warrior {
     return this.id;
   }
 
+  async update(): Promise<void> {
+    await pool.execute('UPDATE `warior` SET `wins` = :wins', {
+      wins: this.wins,
+    });
+  }
+
+  static async getOne(id: string): Promise<Warrior | null> {
+    const [result] = (await pool.execute(
+      'SELECT * FROM `warrior` WHERE `id` = :id',
+      {
+        id,
+      },
+    )) as WarriorRecordResult;
+
+    // return result.length === 0 ? null : new Warrior(result[0] as Warrior);
+    return result.length === 0 ? null : result[0];
+  }
+
   static async listAll(): Promise<Warrior[]> {
     const [result] = (await pool.execute(
       'SELECT * FROM `warrior` ORDER BY `name`',
@@ -66,24 +92,14 @@ class Warrior {
     return result.map((obj) => new Warrior(obj));
   }
 
-  static async getOne(id: string): Promise<Warrior | null> {
-    const [result] = (await pool.execute("SELECT * FROM `warrior` WHERE `id` = :id", {
-        id
-    })) as WarriorRecordResult;
+  static async getTop(topCount: number): Promise<Warrior[]> {
+    const [results] = (await pool.execute(
+      'SELECT * FROM `warrior` ORDER BY `wins` DESC LIMIT :topCount', {
+        topCount: 10
+      },
+    )) as WarriorRecordResult;
 
-    return result.length === 0 ? null : new Warrior(result[0] as Warrior)
-  }
-
-  static async getTop(topCount: number): Promise<WarriorData> {
-    const topUsers = (await pool.execute("SELECT * FROM `warrior` ORDER BY `wins` DESC LIMIT")) as WarriorRecordResult;
-
-    return topUsers
-  }
-
-  async update(): Promise<void> {
-    await pool.execute("UPDATE `warior` SET `wins` = :wins", {
-        wins: this.wins
-    })
+    return results.map((obj) => new Warrior(obj));
   }
 }
 
