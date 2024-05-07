@@ -20,22 +20,18 @@ class Warrior {
 
     const sum = stats.reduce((prev, current) => prev + current, 0);
 
-    stats.forEach((stat) => {
-      if (stat < 1) {
+   for (const stat of stats) {
+     if (stat < 1) {
         throw new ValidationError('Single hero power can not be less than 1');
-      } else return stats;
-    });
+     }
+   }
 
     if (sum !== 10) {
-      throw new Error(
-        `Wrong statistic number, the sum of them must be 10, but it is: ${sum}`,
-      );
+      throw new Error(`Wrong statistic number, the sum of them must be 10, but it is: ${sum}`);
     }
 
     if (name.length < 3 || name.length > 50) {
-      throw new ValidationError(
-        'The name of the warrior must contain at least 3 and maximum 50 characters',
-      );
+      throw new ValidationError('The name of the warrior must contain at least 3 and maximum 50 characters');
     }
 
     this.name = name;
@@ -65,8 +61,13 @@ class Warrior {
   }
 
   async update(): Promise<void> {
-    await pool.execute('UPDATE `warior` SET `wins` = :wins', {
+    if (!this.id) {
+          throw new ValidationError("Cannot update a warrior without an ID.");
+    }
+    
+    await pool.execute('UPDATE `warrior` SET `wins` = :wins WHERE `id` = :id', {
       wins: this.wins,
+      id: this.id
     });
   }
 
@@ -78,8 +79,7 @@ class Warrior {
       },
     )) as WarriorRecordResult;
 
-    // return result.length === 0 ? null : new Warrior(result[0] as Warrior);
-    return result.length === 0 ? null : result[0];
+    return result.length === 0 ? null : new Warrior(result[0] as Warrior);
   }
 
   static async listAll(): Promise<Warrior[]> {
@@ -93,7 +93,7 @@ class Warrior {
   static async getTop(topCount: number): Promise<Warrior[]> {
     const [results] = (await pool.execute(
       'SELECT * FROM `warrior` ORDER BY `wins` DESC LIMIT :topCount', {
-        topCount: 10
+        topCount
       },
     )) as WarriorRecordResult;
 
@@ -102,4 +102,3 @@ class Warrior {
 }
 
 export { Warrior };
-30 minuta
