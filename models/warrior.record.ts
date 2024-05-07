@@ -95,7 +95,7 @@ class Warrior {
       'SELECT * FROM `warrior` ORDER BY `wins` DESC LIMIT :topCount', {
         topCount
       },
-    )) as WarriorRecordResult;
+    ));
 
     return results.map((obj) => new Warrior(obj));
   }
