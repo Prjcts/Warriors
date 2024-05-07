@@ -9,7 +9,6 @@ import { arenaRouter } from './routes/arena-route';
 import { hallOfFameRouter } from './routes/hallOfFame-route';
 import { handleError } from './utils/errors';
 import './utils/db';
-import { Warrior } from './models/warrior.record';
 
 const app = express();
 
@@ -36,14 +35,7 @@ app.use('/warrior', warriorRouter);
 app.use('/arena', arenaRouter);
 app.use('/hall-of-fame', hallOfFameRouter);
 
-const w = new Warrior({
-  name: 'Luka',
-  agility: 4,
-  stamina: 3,
-  strength: 0,
-  defence: 2
-})
-console.log(w);
+
 
 app.use(handleError);
 

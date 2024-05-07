@@ -10,7 +10,7 @@ const handleError = (err: Error, req: Request, res: Response, next: NextFunction
     res
         .status(err instanceof ValidationError ? HttpStatusCode.NotFound : HttpStatusCode.InternalServerError)
         .render('error', {
-            message: err instanceof ValidationError ? err.message : 'Przepraszamy, spróbuj ponownie za kilka minut.',
+            message: err instanceof ValidationError ? err.message : `We're setPriority, try in a while.`,
         });
 };
 
