@@ -79,7 +79,8 @@ class Warrior {
       },
     )) as WarriorRecordResult;
 
-    return result.length === 0 ? null : new Warrior(result[0] as Warrior);
+    // return result.length === 0 ? null : new Warrior(result[0] as Warrior);
+    return result.length === 0 ? null : result[0];
   }
 
   static async listAll(): Promise<Warrior[]> {
