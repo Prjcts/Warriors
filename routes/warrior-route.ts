@@ -3,9 +3,9 @@ import { Router } from 'express';
 const warriorRouter = Router();
 
 warriorRouter
-  .get('/register', async (req, res): Promise<void> => {
+  .get('/add-form', async (req, res): Promise<void> => {
 
-    res.render('register', {});
+    res.render('add-form', {});
   })
   .post('/', (req, res): void => {
     res.render('hall-of-fame', {});
