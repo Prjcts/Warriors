@@ -87,7 +87,6 @@ class Warrior {
       'SELECT * FROM `warrior` ORDER BY `name`',
     )) as WarriorRecordResult;
 
-    return result.map((obj) => new Warrior(obj));
   }
 
   static async getTop(topCount: number): Promise<Warrior[]> {
@@ -95,7 +94,7 @@ class Warrior {
       'SELECT * FROM `warrior` ORDER BY `wins` DESC LIMIT :topCount', {
         topCount
       },
-    )) as WarriorRecordResult;
+    )) ;
 
     return results.map((obj) => new Warrior(obj));
   }
