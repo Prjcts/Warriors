@@ -1,0 +1,19 @@
+The Hall of the Fame:
+<table>
+  <thead>
+  <tr>
+    <th> #</th>
+    <th> Wins</th>
+    <th> Name</th>
+  </tr>
+  </thead>
+  <tbody>
+  {{#each topTen}}
+    <tr>
+      <th>{{this.place}}</th>
+      <td>{{this.warrior.wins}}</td>
+      <td>{{this.warrior.name}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
