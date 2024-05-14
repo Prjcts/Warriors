@@ -97,7 +97,7 @@ class Warrior {
 			},
 		)) as WarriorRecordResult;
 		
-		return result.map((obj) => new Warrior(obj));
+		return results.map((obj) => new Warrior(obj));
 	}
 }
 
